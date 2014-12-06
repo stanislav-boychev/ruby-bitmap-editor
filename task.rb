@@ -1,19 +1,16 @@
 #!/usr/bin/env ruby
+require './bitmap_editor'
 
 class Task
   def initialize
-    @image = nil
+    @bitmap_editor = BitmapEditor.new
   end
 
   def run
     begin
       line = readline
       command, args =  parse_command(line)
-      if command
-        execute_command(command, args)
-      else
-        p 'Unknown command'
-      end
+      execute_command(command, args)
     end while command != :terminate
   end
 
@@ -47,112 +44,49 @@ class Task
   end
 
   def execute_command(command, args)
+    unless command
+      p 'Unknown command'
+      return
+    end
+
     case command
     when :insert
       x, y = args[0].to_i, args[1].to_i
-      create_image(x, y)
+      @bitmap_editor.create_image(x, y)
     when :colour
       x, y = args[0].to_i, args[1].to_i
       colour = args[2]
-      colours_pixel(x, y, colour)
+      @bitmap_editor.colours_pixel(x, y, colour)
     when :clear
-      clear_image
+      @bitmap_editor.clear_image
     when :draw_horizontal
       x = args[0].to_i
       y1 = [args[1].to_i, args[2].to_i].min
       y2 = [args[1].to_i, args[2].to_i].max
       colour = args[3]
-      draw_horizontal_line(x, y1, y2, colour)
+      @bitmap_editor.draw_horizontal_line(x, y1, y2, colour)
     when :draw_vertical
       x1 = [args[0].to_i, args[1].to_i].min
       x2 = [args[0].to_i, args[1].to_i].max
       y = args[2].to_i
       colour = args[3]
-      draw_vertical_line(x1, x2, y, colour)
+      @bitmap_editor.draw_vertical_line(x1, x2, y, colour)
     when :fill_region
       x, y = args[0].to_i, args[1].to_i
       colour = args[2]
-      fill_region(x, y, colour)
+      @bitmap_editor.fill_region(x, y, colour)
     when :show
-      show_image
+      show_image(@bitmap_editor.image)
     end
   end
 
-  def create_image(x, y)
-    return if !x || !y
-
-    @image = Array.new(x).map do |line|
-      line = Array.new(y, '0')
-    end
-  end
-
-  def show_image
-    unless @image
+  def show_image(image)
+    unless image
       p 'No image is entered'
       return
     end
 
-    @image.each { |line| pretty_print line }
-  end
-
-  def colours_pixel(x, y, colour)
-    return if !x ||
-              !y ||
-              !colour ||
-              !@image
-
-    @image[x][y] = colour
-  end
-
-  def fill_region(x, y, colour)
-    return if !x ||
-              !y ||
-              x < 0 ||
-              y < 0 ||
-              !colour ||
-              !@image ||
-              @image[x][y] == colour
-
-    old_colour = @image[x][y]
-    @image[x][y] = colour
-    neighbours = get_neighbours(x, y)
-    fill_region(x-1, y, colour) if neighbours[:top] == old_colour
-    fill_region(x, y+1, colour) if neighbours[:right] == old_colour
-    fill_region(x+1, y, colour) if neighbours[:bottom] == old_colour
-    fill_region(x, y-1, colour) if neighbours[:left] == old_colour
-  end
-
-  def get_neighbours(x, y)
-    { top: x > 0 ? @image[x-1][y] : nil,
-      right: @image[x][y+1],
-      bottom: @image[x+1] ? @image[x+1][y] : nil,
-      left: y > 0 ? @image[x][y-1] : nil
-    }
-  end
-
-  def draw_horizontal_line(x, y1, y2, colour)
-    return if !x ||
-              !y1 ||
-              !y2 ||
-              !colour ||
-              !@image
-
-    line = @image[x][y1..y2]
-    @image[x][y1..y2] = line.map { |pixel| pixel = colour }
-  end
-
-  def draw_vertical_line(x1, x2, y, colour)
-    return if !x1 ||
-              !x1 ||
-              !y ||
-              !colour ||
-              !@image
-
-    lines = @image[x1..x2]
-    @image[x1..x2] = lines.map do |line|
-      line[y] = colour
-      line
-    end
+    image.each { |line| pretty_print line }
   end
 
   def pretty_print(text)
@@ -161,10 +95,6 @@ class Task
     else
       p text
     end
-  end
-
-  def clear_image
-    @image = nil
   end
 end
 
