@@ -10,6 +10,7 @@ class Task
     begin
       line = readline
       command, args =  parse_command(line)
+      next if command == :terminate
       execute_command(command, args)
     end while command != :terminate
   end
@@ -37,50 +38,62 @@ class Task
     end
   end
 
-  def normalize_command(command)
-    return unless command
-
-    command.downcase.to_sym
-  end
-
   def execute_command(command, args)
     unless command
       p 'Unknown command'
       return
     end
 
-    case command
-    when :insert
-      x, y = args[0].to_i, args[1].to_i
-      @bitmap_editor.create_image(x, y)
-    when :colour
-      x, y = args[0].to_i, args[1].to_i
-      colour = args[2]
-      @bitmap_editor.colours_pixel(x, y, colour)
-    when :clear
-      @bitmap_editor.clear_image
-    when :draw_horizontal
-      x = args[0].to_i
-      y1 = [args[1].to_i, args[2].to_i].min
-      y2 = [args[1].to_i, args[2].to_i].max
-      colour = args[3]
-      @bitmap_editor.draw_horizontal_line(x, y1, y2, colour)
-    when :draw_vertical
-      x1 = [args[0].to_i, args[1].to_i].min
-      x2 = [args[0].to_i, args[1].to_i].max
-      y = args[2].to_i
-      colour = args[3]
-      @bitmap_editor.draw_vertical_line(x1, x2, y, colour)
-    when :fill_region
-      x, y = args[0].to_i, args[1].to_i
-      colour = args[2]
-      @bitmap_editor.fill_region(x, y, colour)
-    when :show
-      show_image(@bitmap_editor.image)
-    end
+    send("handle_#{command}", @bitmap_editor, args)
   end
 
-  def show_image(image)
+  private
+
+  def normalize_command(command)
+    return unless command
+
+    command.downcase.to_sym
+  end
+
+  def handle_insert(bitmap_editor, args)
+    x, y = args[0].to_i, args[1].to_i
+    bitmap_editor.create_image(x, y)
+  end
+
+  def handle_colour(bitmap_editor, args)
+    x, y = args[0].to_i, args[1].to_i
+    colour = args[2]
+    bitmap_editor.colours_pixel(x, y, colour)
+  end
+
+  def handle_clear(bitmap_editor, args)
+    bitmap_editor.clear_image
+  end
+
+  def handle_draw_horizontal(bitmap_editor, args)
+    x = args[0].to_i
+    y1 = [args[1].to_i, args[2].to_i].min
+    y2 = [args[1].to_i, args[2].to_i].max
+    colour = args[3]
+    bitmap_editor.draw_horizontal_line(x, y1, y2, colour)
+  end
+
+  def handle_draw_vertical(bitmap_editor, args)
+    x1 = [args[0].to_i, args[1].to_i].min
+    x2 = [args[0].to_i, args[1].to_i].max
+    y = args[2].to_i
+    colour = args[3]
+    bitmap_editor.draw_vertical_line(x1, x2, y, colour)
+  end
+
+  def handle_fill_region(bitmap_editor, args)
+    x, y = args[0].to_i, args[1].to_i
+    colour = args[2]
+    bitmap_editor.fill_region(x, y, colour)
+  end
+
+  def handle_show(bitmap_editor, args)
+    image = bitmap_editor.image
     unless image
       p 'No image is entered'
       return
