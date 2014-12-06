@@ -23,6 +23,8 @@ class Task
       :clear
     when :s
       :show
+    when :l
+      [:colour, args]
     when :x then :terminate
       :terminate
     end
@@ -39,6 +41,10 @@ class Task
     when :insert
       x, y = args[0].to_i, args[1].to_i
       create_image(x, y)
+    when :colour
+      x, y = args[0].to_i, args[1].to_i
+      colour = args[2]
+      colours_pixel(x, y, colour)
     when :clear
       clear_image
     when :show
@@ -60,6 +66,15 @@ class Task
     end
 
     @image.each { |line| pretty_print line }
+  end
+
+  def colours_pixel(x, y, colour)
+    return if !x ||
+              !y ||
+              !colour ||
+              !@image
+
+    @image[x][y] = colour
   end
 
   def pretty_print(text)
