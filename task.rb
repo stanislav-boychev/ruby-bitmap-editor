@@ -9,7 +9,11 @@ class Task
     begin
       line = readline
       command, args =  parse_command(line)
-      execute_command(command, args)
+      if command
+        execute_command(command, args)
+      else
+        p 'Unknown command'
+      end
     end while command != :terminate
   end
 
