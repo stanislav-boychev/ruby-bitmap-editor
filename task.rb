@@ -32,7 +32,9 @@ class Task
     when :h
       [:draw_horizontal, args]
     when :v
-        [:draw_vertical, args]
+      [:draw_vertical, args]
+    when :f
+      [:fill_region, args]
     when :x then :terminate
       :terminate
     end
@@ -67,6 +69,10 @@ class Task
       y = args[2].to_i
       colour = args[3]
       draw_vertical_line(x1, x2, y, colour)
+    when :fill_region
+      x, y = args[0].to_i, args[1].to_i
+      colour = args[2]
+      fill_region(x, y, colour)
     when :show
       show_image
     end
@@ -96,6 +102,32 @@ class Task
               !@image
 
     @image[x][y] = colour
+  end
+
+  def fill_region(x, y, colour)
+    return if !x ||
+              !y ||
+              x < 0 ||
+              y < 0 ||
+              !colour ||
+              !@image ||
+              @image[x][y] == colour
+
+    old_colour = @image[x][y]
+    @image[x][y] = colour
+    neighbours = get_neighbours(x, y)
+    fill_region(x-1, y, colour) if neighbours[:top] == old_colour
+    fill_region(x, y+1, colour) if neighbours[:right] == old_colour
+    fill_region(x+1, y, colour) if neighbours[:bottom] == old_colour
+    fill_region(x, y-1, colour) if neighbours[:left] == old_colour
+  end
+
+  def get_neighbours(x, y)
+    { top: x > 0 ? @image[x-1][y] : nil,
+      right: @image[x][y+1],
+      bottom: @image[x+1] ? @image[x+1][y] : nil,
+      left: y > 0 ? @image[x][y-1] : nil
+    }
   end
 
   def draw_horizontal_line(x, y1, y2, colour)
