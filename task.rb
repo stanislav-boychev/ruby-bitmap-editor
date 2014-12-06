@@ -53,10 +53,11 @@ class Task
   end
 
   def create_image(x, y)
-    return if !x && !y
+    return if !x || !y
 
-    line = Array.new(y, '0')
-    @image = Array.new(x, line)
+    @image = Array.new(x).map do |line|
+      line = Array.new(y, '0')
+    end
   end
 
   def show_image
