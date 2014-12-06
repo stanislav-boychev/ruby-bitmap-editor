@@ -31,6 +31,8 @@ class Task
       [:colour, args]
     when :h
       [:draw_horizontal, args]
+    when :v
+        [:draw_vertical, args]
     when :x then :terminate
       :terminate
     end
@@ -59,6 +61,12 @@ class Task
       y2 = [args[1].to_i, args[2].to_i].max
       colour = args[3]
       draw_horizontal_line(x, y1, y2, colour)
+    when :draw_vertical
+      x1 = [args[0].to_i, args[1].to_i].min
+      x2 = [args[0].to_i, args[1].to_i].max
+      y = args[2].to_i
+      colour = args[3]
+      draw_vertical_line(x1, x2, y, colour)
     when :show
       show_image
     end
@@ -97,8 +105,22 @@ class Task
               !colour ||
               !@image
 
-     line = @image[x][y1..y2]
-     @image[x][y1..y2] = line.map { |pixel| pixel = colour }
+    line = @image[x][y1..y2]
+    @image[x][y1..y2] = line.map { |pixel| pixel = colour }
+  end
+
+  def draw_vertical_line(x1, x2, y, colour)
+    return if !x1 ||
+              !x1 ||
+              !y ||
+              !colour ||
+              !@image
+
+    lines = @image[x1..x2]
+    @image[x1..x2] = lines.map do |line|
+      line[y] = colour
+      line
+    end
   end
 
   def pretty_print(text)
