@@ -29,6 +29,8 @@ class Task
       :show
     when :l
       [:colour, args]
+    when :v
+      [:draw_vertical, args]
     when :x then :terminate
       :terminate
     end
@@ -51,6 +53,12 @@ class Task
       colours_pixel(x, y, colour)
     when :clear
       clear_image
+    when :draw_vertical
+      x = args[0].to_i
+      y1 = [args[1].to_i, args[2].to_i].min
+      y2 = [args[1].to_i, args[2].to_i].max
+      colour = args[3]
+      draw_vertical_line(x, y1, y2, colour)
     when :show
       show_image
     end
@@ -80,6 +88,17 @@ class Task
               !@image
 
     @image[x][y] = colour
+  end
+
+  def draw_vertical_line(x, y1, y2, colour)
+    return if !x ||
+              !y1 ||
+              !y2 ||
+              !colour ||
+              !@image
+
+     line = @image[x][y1..y2]
+     @image[x][y1..y2] = line.map { |pixel| pixel = colour }
   end
 
   def pretty_print(text)
