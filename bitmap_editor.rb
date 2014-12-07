@@ -11,12 +11,13 @@ class BitmapEditor
   end
 
   def colours_pixel(x, y, colour)
-    return if !valid_coordinates?(x: [x], y: [y]) && !colour
+    return if !valid_coordinates?(x: [x], y: [y]) || !colour
 
     @image[x][y] = normalize_colour(colour)
   end
 
   def fill_region(x, y, colour)
+    normalized_colour = normalize_colour(colour)
     # Exit condtions for recursive:
     # 1. If x or y are less than zero we cannot access such
     #    elements in the image
@@ -25,12 +26,10 @@ class BitmapEditor
     #    elemens
     return if !valid_coordinates?(x: [x], y: [y]) ||
               !colour ||
-              x < 0 ||
-              y < 0 ||
-              @image[x][y] == colour
+              @image[x][y] == normalized_colour
 
     old_colour = @image[x][y]
-    @image[x][y] = normalize_colour(colour)
+    @image[x][y] = normalized_colour
 
     neighbours = get_neighbours(x, y)
 
@@ -62,6 +61,10 @@ class BitmapEditor
     end
   end
 
+  def image?
+    @image && @image.any?
+  end
+
   private
 
   def normalize_colour(colour)
@@ -69,24 +72,23 @@ class BitmapEditor
   end
 
   def valid_coordinates?(coordinates = {})
-    x_coordinates_valid = coordinates[:x].reduce(true) { |product, x|
+    return unless image?
+
+    x_coordinates_valid = coordinates[:x].reduce(true) do |product, x|
       product &&
       x &&
       x >= 0 &&
       x < @image.size
-    }
+   end
 
-    y_coordinates_valid = coordinates[:y].reduce(true) { |product, y|
+    y_coordinates_valid = coordinates[:y].reduce(true) do |product, y|
       product &&
       y &&
       y >= 0 &&
       y < @image[0].size
-    }
+    end
 
-    @image &&
-    @image.any? &&
-    x_coordinates_valid &&
-    y_coordinates_valid
+    x_coordinates_valid && y_coordinates_valid
   end
 
   def get_neighbours(x, y)
