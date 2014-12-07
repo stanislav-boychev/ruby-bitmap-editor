@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require './bitmap_editor'
-require 'pry'
 
 class Task
   X_MAX = 250

@@ -1,4 +1,3 @@
-require 'pry'
 class BitmapEditor
   attr_accessor :image
 
