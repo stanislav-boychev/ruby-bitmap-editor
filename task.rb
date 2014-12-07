@@ -59,15 +59,20 @@ class Task
   end
 
   def handle_insert(bitmap_editor, *args)
+    if !is_number?(args[0]) || !is_number?(args[1])
+      p not_a_number_message
+      return
+    end
+
     x, y = args[0].to_i, args[1].to_i
 
     if x < 1 || x > X_MAX
-      p invalid_coordinate_message 'row', x, 250
+      p invalid_coordinate_message 'row', x, 1, 250
       return
     end
 
     if y < 1 || y > Y_MAX
-      p invalid_coordinate_message 'column', y, 250
+      p invalid_coordinate_message 'column', y, 1, 250
       return
     end
 
@@ -76,7 +81,12 @@ class Task
 
   def handle_colour(bitmap_editor, *args)
     unless bitmap_editor.image?
-      p 'No image. Please, insert image.'
+      p no_image_message
+      return
+    end
+
+    if !is_number?(args[0]) || !is_number?(args[1])
+      p not_a_number_message
       return
     end
 
@@ -84,18 +94,18 @@ class Task
     colour = args[2]
 
     max = max_coordinates(bitmap_editor)
-    if x < 0 || x > max[:x]
-      p invalid_coordinate_message 'row', x, max[:x] - 1
+    if x < 0 || x > max[:x] - 1
+      p invalid_coordinate_message 'row', x, 0, max[:x] - 1
       return
     end
 
-    if y < 0 || y > max[:y]
-      p invalid_coordinate_message 'column', y, max[:y] - 1
+    if y < 0 || y > max[:y] - 1
+      p invalid_coordinate_message 'column', y, 0, max[:y] - 1
       return
     end
 
-    unless colour
-      p invalid_colour_message
+    if !is_valid_colour? colour
+      p invalid_colour_message colour
       return
     end
 
@@ -107,8 +117,13 @@ class Task
   end
 
   def handle_draw_horizontal(bitmap_editor, *args)
+    if !is_number?(args[0]) || !is_number?(args[1]) || !is_number?(args[2])
+      p not_a_number_message
+      return
+    end
+
     unless bitmap_editor.image?
-      p 'No image. Please, insert image.'
+      p no_image_message
       return
     end
 
@@ -118,23 +133,23 @@ class Task
     colour = args[3]
 
     max = max_coordinates(bitmap_editor)
-    if x < 0 || x > max[:x]
-      p invalid_coordinate_message 'row', x, max[:x] - 1
+    if x < 0 || x > max[:x] - 1
+      p invalid_coordinate_message 'row', x, 0, max[:x] - 1
       return
     end
 
-    if y1 < 0 || y1 > max[:y]
-      p invalid_coordinate_message 'column', y1, max[:y] - 1
+    if y1 < 0 || y1 > max[:y] - 1
+      p invalid_coordinate_message 'column', y1, 0, max[:y] - 1
       return
     end
 
-    if y2 < 0 || y2 > max[:y]
-      p invalid_coordinate_message 'column', y2, max[:y] - 1
+    if y2 < 0 || y2 > max[:y] - 1
+      p invalid_coordinate_message 'column', y2, 0, max[:y] - 1
       return
     end
 
-    unless colour
-      p invalid_colour_message
+    if !is_valid_colour? colour
+      p invalid_colour_message colour
       return
     end
 
@@ -142,8 +157,13 @@ class Task
   end
 
   def handle_draw_vertical(bitmap_editor, *args)
+    if !is_number?(args[0]) || !is_number?(args[1]) || !is_number?(args[2])
+      p not_a_number_message
+      return
+    end
+
     unless bitmap_editor.image?
-      p 'No image. Please, insert image.'
+      p no_image_message
       return
     end
 
@@ -153,23 +173,23 @@ class Task
     colour = args[3]
 
     max = max_coordinates(bitmap_editor)
-    if x1 < 0 || x1 > max[:x]
-      p invalid_coordinate_message 'row', x1, max[:x] - 1
+    if x1 < 0 || x1 > max[:x] - 1
+      p invalid_coordinate_message 'row', x1, 0, max[:x] - 1
       return
     end
 
-    if x2 < 0 || x2 > max[:x]
-      p invalid_coordinate_message 'row', x2, max[:x] - 1
+    if x2 < 0 || x2 > max[:x] - 1
+      p invalid_coordinate_message 'row', x2, 0, max[:x] - 1
       return
     end
 
-    if y < 0 || y > max[:y]
-      p invalid_coordinate_message 'column', y, max[:y] - 1
+    if y < 0 || y > max[:y] - 1
+      p invalid_coordinate_message 'column', y, 0, max[:y] - 1
       return
     end
 
-    unless colour
-      p invalid_colour_message
+    if !is_valid_colour? colour
+      p invalid_colour_message colour
       return
     end
 
@@ -177,8 +197,13 @@ class Task
   end
 
   def handle_fill_region(bitmap_editor, *args)
+    if !is_number?(args[0]) || !is_number?(args[1])
+      p not_a_number_message
+      return
+    end
+
     unless bitmap_editor.image?
-      p 'No image. Please, insert image.'
+      p no_image_message
       return
     end
 
@@ -186,18 +211,18 @@ class Task
     colour = args[2]
 
     max = max_coordinates(bitmap_editor)
-    if x < 0 || x > max[:x]
-      p invalid_coordinate_message 'row', x, max[:x] - 1
+    if x < 0 || x > max[:x] - 1
+      p invalid_coordinate_message 'row', x, 0, max[:x] - 1
       return
     end
 
-    if y < 0 || y > max[:y]
-      p invalid_coordinate_message 'column', y, max[:y] - 1
+    if y < 0 || y > max[:y] - 1
+      p invalid_coordinate_message 'column', y, 0, max[:y] - 1
       return
     end
 
-    unless colour
-      p invalid_colour_message
+    if !is_valid_colour? colour
+      p invalid_colour_message colour
       return
     end
 
@@ -206,19 +231,27 @@ class Task
 
   def handle_show(bitmap_editor)
     unless bitmap_editor.image?
-      p 'No image is entered'
+      p no_image_message
       return
     end
 
     bitmap_editor.image.each { |line| pretty_print line }
   end
 
-  def invalid_coordinate_message(type, coordinate, max)
-    "Please enter valid #{type} number between 1 and #{max}. Your input is: #{coordinate}"
+  def invalid_coordinate_message(type, coordinate, min, max)
+    "Please enter valid #{type} number between #{min} and #{max}. Your input is: #{coordinate}."
   end
 
-  def invalid_colour_message
-    "Please enter colour."
+  def no_image_message
+    'No image. Please, insert image.'
+  end
+
+  def invalid_colour_message(input)
+    "Please enter valid colour (only characters). Your input is #{input}"
+  end
+
+  def not_a_number_message
+    'Please, enter a number as a coordinate.'
   end
 
   def max_coordinates(bitmap_editor)
@@ -228,6 +261,16 @@ class Task
     { x: image.size,
       y: image[0].size
     }
+  end
+
+  def is_number?(number)
+    number.is_a?(Integer) ||
+    number.is_a?(Float) ||
+    /\A[-+]?[0-9]+\z/.match(number)
+  end
+
+  def is_valid_colour?(colour)
+    colour && colour.is_a?(String) && /\A[a-zA-Z]+\z/.match(colour)
   end
 
   def pretty_print(text)
