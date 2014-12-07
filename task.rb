@@ -15,6 +15,8 @@ class Task
     end while command != :terminate
   end
 
+  private
+
   def parse_command(command_line)
     command, *args = command_line.split(' ')
     command = normalize_command(command)
@@ -46,8 +48,6 @@ class Task
 
     send("handle_#{command}", @bitmap_editor, args)
   end
-
-  private
 
   def normalize_command(command)
     return unless command
