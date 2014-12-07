@@ -2,9 +2,6 @@
 require './bitmap_editor'
 
 class Task
-  X_MAX = 250
-  Y_MAX = 250
-
   def initialize
     @bitmap_editor = BitmapEditor.new
   end
@@ -66,13 +63,14 @@ class Task
 
     x, y = args[0].to_i, args[1].to_i
 
-    if x < 1 || x > X_MAX
-      p invalid_coordinate_message 'row', x, 1, 250
+    max = max_coordinates(bitmap_editor)
+    if x < 1 || x > max[:x]
+      p invalid_coordinate_message 'row', x, 1, max[:x]
       return
     end
 
-    if y < 1 || y > Y_MAX
-      p invalid_coordinate_message 'column', y, 1, 250
+    if y < 1 || y > max[:y]
+      p invalid_coordinate_message 'column', y, 1, max[:y]
       return
     end
 
@@ -255,11 +253,9 @@ class Task
   end
 
   def max_coordinates(bitmap_editor)
-    return {x: X_MAX, y: Y_MAX } unless bitmap_editor.image?
-
-    image = bitmap_editor.image
-    { x: image.size,
-      y: image[0].size
+    {
+      x: bitmap_editor.max_x,
+      y: bitmap_editor.max_y
     }
   end
 

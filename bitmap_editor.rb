@@ -1,5 +1,7 @@
 class BitmapEditor
   attr_accessor :image
+  X_MAX = 250
+  Y_MAX = 250
 
   def create_image(x, y)
     return if !x || !y
@@ -61,7 +63,17 @@ class BitmapEditor
   end
 
   def image?
-    @image && @image.any?
+    @image && @image.any? && @image.first.is_a?(Array) && @image.first.any?
+  end
+
+  def max_x
+    return X_MAX unless image?
+    return @image.size
+  end
+
+  def max_y
+    return Y_MAX unless image?
+    return @image.first.size
   end
 
   private
@@ -77,14 +89,14 @@ class BitmapEditor
       product &&
       x &&
       x >= 0 &&
-      x < @image.size
+      x < max_x
    end
 
     y_coordinates_valid = coordinates[:y].reduce(true) do |product, y|
       product &&
       y &&
       y >= 0 &&
-      y < @image[0].size
+      y < max_y
     end
 
     x_coordinates_valid && y_coordinates_valid
